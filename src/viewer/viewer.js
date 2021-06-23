@@ -1174,6 +1174,7 @@ export class Viewer extends EventDispatcher{
 		// let map = $('#potree_map');
 		// map.toggle(100);
 
+		return;
 		if (this.mapView) {
 			this.mapView.toggle();
 		}
@@ -1205,7 +1206,7 @@ export class Viewer extends EventDispatcher{
 			this.onGUILoaded(callback);
 		}
 
-		let viewer = this;
+		// let viewer = this;
 		// let sidebarContainer = $('#potree_sidebar_container');
 		// sidebarContainer.load(new URL(Potree.scriptPath + '/sidebar.html').href, () => {
 		// 	sidebarContainer.css('width', '300px');
@@ -1223,13 +1224,13 @@ export class Viewer extends EventDispatcher{
 		// 	imgMapToggle.id = 'potree_map_toggle';
 
 
-
-		// 	let elButtons = $("#potree_quick_buttons").get(0);
+		// let elButtons = $("#potree_quick_buttons").get(0);
 
 		// 	elButtons.append(imgMenuToggle);
 		// 	elButtons.append(imgMapToggle);
 		// })
 
+		let elButtons = $("#potree_quick_buttons").get(0);
 
 		VRButton.createButton(this.renderer).then(vrButton => {
 
@@ -1254,7 +1255,7 @@ export class Viewer extends EventDispatcher{
 			element.style.textShadow = "black 2px 2px 2px";
 			element.style.display = "block";
 
-			elButtons.append(element);
+			elButtons && elButtons.append(element);
 
 			vrButton.onStart(() => {
 				this.dispatchEvent({type: "vr_start"});
@@ -1268,16 +1269,20 @@ export class Viewer extends EventDispatcher{
 		// this.mapView = new MapView(this);
 		// this.mapView.init();
 
-		i18n.init({
-			lng: 'en',
-			resGetPath: Potree.resourcePath + '/lang/__lng__/__ns__.json',
-			preload: ['en', 'fr', 'de', 'jp', 'se', 'es', 'zh'],
-			getAsync: true,
-			debug: false
-		}, function (t) {
-			// Start translation once everything is loaded
-			$('body').i18n();
-		});
+		// i18n && i18n.init({
+		// 	lng: 'en',
+		// 	resGetPath: Potree.resourcePath + '/lang/__lng__/__ns__.json',
+		// 	preload: ['en', 'fr', 'de', 'jp', 'se', 'es', 'zh'],
+		// 	getAsync: true,
+		// 	debug: false
+		// }, function (t) {
+		// 	// Start translation once everything is loaded
+		// 	$('body').i18n();
+		// });
+
+		// console.log(ProfileWindow, ProfileWindowController);
+		this.profileWindow = new ProfileWindow(this);
+		this.profileWindowController = new ProfileWindowController(this);
 
 		$(() => {
 			//initSidebar(this);
@@ -1291,18 +1296,18 @@ export class Viewer extends EventDispatcher{
 			//}
 
 			let elProfile = $('<div>').load(new URL(Potree.scriptPath + '/profile.html').href, () => {
-				$(document.body).append(elProfile.children());
-				this.profileWindow = new ProfileWindow(this);
-				this.profileWindowController = new ProfileWindowController(this);
+				// $(document.body).append(elProfile.children());
+				// this.profileWindow = new ProfileWindow(this);
+				// this.profileWindowController = new ProfileWindowController(this);
 
-				$('#profile_window').draggable({
-					handle: $('#profile_titlebar'),
-					containment: $(document.body)
-				});
-				$('#profile_window').resizable({
-					containment: $(document.body),
-					handles: 'n, e, s, w, ne, se, sw, nw'
-				});
+				// $('#profile_window').draggable({
+				// 	handle: $('#profile_titlebar'),
+				// 	containment: $(document.body)
+				// });
+				// $('#profile_window').resizable({
+				// 	containment: $(document.body),
+				// 	handles: 'n, e, s, w, ne, se, sw, nw'
+				// });
 
 				$(() => {
 					this.guiLoaded = true;
@@ -1836,7 +1841,10 @@ export class Viewer extends EventDispatcher{
 
 			// profile segments
 			for(let profile of this.scene.profiles){
-				boxes.push(...profile.boxes);
+				boxes.push(...profile.boxes.map(box => {
+					box.color = profile.color || new THREE.Color(0xff0000);
+					return box;
+				}));
 			}
 			
 			// Needed for .getInverse(), pre-empt a determinant of 0, see #815 / #816
@@ -1848,7 +1856,12 @@ export class Viewer extends EventDispatcher{
 				let boxInverse = box.matrixWorld.clone().invert();
 				let boxPosition = box.getWorldPosition(new THREE.Vector3());
 
-				return {box: box, inverse: boxInverse, position: boxPosition};
+				return {
+					box: box, 
+					inverse: boxInverse, 
+					position: boxPosition, 
+					color: box.color || new THREE.Color(0xff0000)
+				};
 			});
 
 			let clipPolygons = this.scene.polygonClipVolumes.filter(vol => vol.initialized);

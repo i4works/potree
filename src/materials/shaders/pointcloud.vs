@@ -7,6 +7,7 @@ precision highp int;
 
 attribute vec3 position;
 attribute vec3 color;
+attribute float distance;
 attribute float intensity;
 attribute float classification;
 attribute float returnNumber;
@@ -48,6 +49,7 @@ uniform int clipTask;
 uniform int clipMethod;
 #if defined(num_clipboxes) && num_clipboxes > 0
 	uniform mat4 clipBoxes[num_clipboxes];
+	uniform vec3 clipBoxColors[num_clipboxes];
 #endif
 
 #if defined(num_clipspheres) && num_clipspheres > 0
@@ -79,6 +81,7 @@ uniform float uOpacity;
 
 uniform vec2 elevationRange;
 uniform vec2 intensityRange;
+uniform vec2 distanceRange;
 
 uniform vec2 uFilterReturnNumberRange;
 uniform vec2 uFilterNumberOfReturnsRange;
@@ -405,6 +408,15 @@ vec3 getRGB(){
 	return rgb;
 }
 
+vec3 getDistance() {
+  float w = (distance - distanceRange.x) / (distanceRange.y - distanceRange.x);
+	clamp(w, 0.0, 1.0);
+
+	vec3 cDistance = texture2D(gradient, vec2(w, 1.0-w)).rgb;
+
+	return cDistance;
+}
+
 float getIntensity(){
 	float w = (intensity - intensityRange.x) / (intensityRange.y - intensityRange.x);
 	w = pow(w, uIntensity_gbc.x);
@@ -610,6 +622,8 @@ vec3 getColor(){
 	#elif defined color_type_rgb_height
 		vec3 cHeight = getElevation();
 		color = (1.0 - uTransition) * getRGB() + uTransition * cHeight;
+	#elif defined color_type_distance
+	  color = getDistance();
 	#elif defined color_type_depth
 		float linearDepth = gl_Position.w;
 		float expDepth = (gl_Position.z / gl_Position.w) * 0.5 + 0.5;
@@ -803,6 +817,7 @@ void doClipping(){
 
 	int clipVolumesCount = 0;
 	int insideCount = 0;
+	vec3 clipColor = vec3(1.0, 0.0, 0.0);
 
 	#if defined(num_clipboxes) && num_clipboxes > 0
 		for(int i = 0; i < num_clipboxes; i++){
@@ -812,6 +827,9 @@ void doClipping(){
 			inside = inside && -0.5 <= clipPosition.z && clipPosition.z <= 0.5;
 
 			insideCount = insideCount + (inside ? 1 : 0);
+			if (inside) {
+			  clipColor = clipBoxColors[i];
+			}
 			clipVolumesCount++;
 		}	
 	#endif
@@ -830,7 +848,9 @@ void doClipping(){
 
 	if(clipMethod == CLIPMETHOD_INSIDE_ANY){
 		if(insideAny && clipTask == CLIPTASK_HIGHLIGHT){
-			vColor.r += 0.5;
+			vColor.r = clipColor.r;
+			vColor.g = clipColor.g;
+			vColor.b = clipColor.b;
 		}else if(!insideAny && clipTask == CLIPTASK_SHOW_INSIDE){
 			gl_Position = vec4(100.0, 100.0, 100.0, 1.0);
 		}else if(insideAny && clipTask == CLIPTASK_SHOW_OUTSIDE){
@@ -838,7 +858,9 @@ void doClipping(){
 		}
 	}else if(clipMethod == CLIPMETHOD_INSIDE_ALL){
 		if(insideAll && clipTask == CLIPTASK_HIGHLIGHT){
-			vColor.r += 0.5;
+			vColor.r = clipColor.r;
+			vColor.g = clipColor.g;
+			vColor.b = clipColor.b;
 		}else if(!insideAll && clipTask == CLIPTASK_SHOW_INSIDE){
 			gl_Position = vec4(100.0, 100.0, 100.0, 1.0);
 		}else if(insideAll && clipTask == CLIPTASK_SHOW_OUTSIDE){

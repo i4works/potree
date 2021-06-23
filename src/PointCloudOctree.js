@@ -950,9 +950,11 @@ export class PointCloudOctree extends PointCloudTree {
 					point[attributeName] = position;
 				} else if (attributeName === 'indices') {
 
+				} else if (attributeName === 'distance') {
+					point[attributeName] = attribute.array[hit.pIndex];
 				} else {
 
-					let values = attribute.array.slice(attribute.itemSize * hit.pIndex, attribute.itemSize * (hit.pIndex + 1)) ;
+					let values = attribute.array.slice(attribute.itemSize * hit.pIndex, attribute.itemSize * (hit.pIndex + 1));
 
 					if(attribute.potree){
 						const {scale, offset} = attribute.potree;

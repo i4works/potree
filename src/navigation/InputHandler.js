@@ -254,7 +254,7 @@ export class InputHandler extends EventDispatcher {
 		e.preventDefault();
 
 		let consumed = false;
-		let consume = () => { return consumed = true; };
+		let consume = () => { consumed = true; };
 		if (this.hoveredElements.length === 0) {
 			for (let inputListener of this.getSortedListeners()) {
 				inputListener.dispatchEvent({
@@ -306,7 +306,7 @@ export class InputHandler extends EventDispatcher {
 
 		
 		let consumed = false;
-		let consume = () => { return consumed = true; };
+		let consume = () => { consumed = true; };
 		if (this.hoveredElements.length === 0) {
 			for (let inputListener of this.getSortedListeners()) {
 				inputListener.dispatchEvent({
@@ -431,7 +431,7 @@ export class InputHandler extends EventDispatcher {
 						type: 'drag',
 						drag: this.drag,
 						viewer: this.viewer,
-						consume: () => {dragConsumed = true;}
+						consume: () => { dragConsumed = true; }
 					});
 
 					if(dragConsumed){

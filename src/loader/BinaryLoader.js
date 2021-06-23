@@ -126,6 +126,30 @@ export class BinaryLoader{
 			let numPoints = e.data.buffer.byteLength / pointAttributes.byteSize;
 			
 			node.numPoints = numPoints;
+
+			const colorBuffer = new Uint8Array(buffers.rgba.buffer);
+			const distanceBuffer = new Float32Array(numPoints);
+
+			// calculate distance using color bytes
+
+			for (let i = 0; i < numPoints; i++) {
+				const r = colorBuffer[4 * i];
+				const g = colorBuffer[4 * i + 1];
+				const b = colorBuffer[4 * i + 2];
+
+				const ab = new ArrayBuffer(4);
+				const dw = new DataView(ab);
+
+				dw.setUint8(0, r);
+				dw.setUint8(1, g);
+				dw.setUint8(2, b);
+				dw.setUint8(3, 0);
+
+				distanceBuffer[i] = dw.getFloat32(0);
+			}
+
+			geometry.setAttribute('distance', new THREE.BufferAttribute(distanceBuffer, 1));
+
 			node.geometry = geometry;
 			node.mean = new THREE.Vector3(...data.mean);
 			node.tightBoundingBox = tightBoundingBox;

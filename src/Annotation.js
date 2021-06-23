@@ -23,6 +23,10 @@ export class Annotation extends EventDispatcher {
 			this.position = new THREE.Vector3(...args.position);
 		}
 
+		if (args.sgID) {
+			this.sgID = args.sgID;
+		}
+
 		this.cameraPosition = (args.cameraPosition instanceof Array)
 			? new THREE.Vector3().fromArray(args.cameraPosition) : args.cameraPosition;
 		this.cameraTarget = (args.cameraTarget instanceof Array)
@@ -482,7 +486,7 @@ export class Annotation extends EventDispatcher {
 
 	setHighlighted (highlighted) {
 		if (highlighted) {
-			this.domElement.css('opacity', '0.8');
+			this.domElement.css('opacity', '1');
 			this.elTitlebar.css('box-shadow', '0 0 5px #fff');
 			this.domElement.css('z-index', '1000');
 
@@ -492,7 +496,7 @@ export class Annotation extends EventDispatcher {
 				this.elDescription.css('position', 'relative');
 			}
 		} else {
-			this.domElement.css('opacity', '0.5');
+			this.domElement.css('opacity', '0.7');
 			this.elTitlebar.css('box-shadow', '');
 			this.domElement.css('z-index', '100');
 			this.descriptionVisible = false;

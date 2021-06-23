@@ -56,6 +56,7 @@ export class PointCloudMaterial extends THREE.RawShaderMaterial {
 
 		this._defaultIntensityRangeChanged = false;
 		this._defaultElevationRangeChanged = false;
+		this._defaultDistanceRangeChanged = false;
 
 		{
 			const [width, height] = [256, 1];
@@ -98,6 +99,7 @@ export class PointCloudMaterial extends THREE.RawShaderMaterial {
 			octreeSize:			{ type: "f", value: 0 },
 			bbSize:				{ type: "fv", value: [0, 0, 0] },
 			elevationRange:		{ type: "2fv", value: [0, 0] },
+			distanceRange: { type: "2fv", value: [0, 20] },
 
 			clipBoxCount:		{ type: "f", value: 0 },
 			//clipSphereCount:	{ type: "f", value: 0 },
@@ -117,10 +119,10 @@ export class PointCloudMaterial extends THREE.RawShaderMaterial {
 			diffuse:			{ type: "fv", value: [1, 1, 1] },
 			transition:			{ type: "f", value: 0.5 },
 
-			 intensityRange:		{ type: "fv", value: [Infinity, -Infinity] },
+			intensityRange:		{ type: "fv", value: [Infinity, -Infinity] },
 
-			intensity_gbc: 		{ type: "fv", value: [1, 0, 0]},
-			uRGB_gbc:	 		{ type: "fv", value: [1, 0, 0]},
+			intensity_gbc: 		{ type: "fv", value: [1, 0, 0] },
+			uRGB_gbc:	 		{ type: "fv", value: [1, 0, 0] },
 			// intensityGamma:		{ type: "f", value: 1 },
 			// intensityContrast:	{ type: "f", value: 0 },
 			// intensityBrightness:{ type: "f", value: 0 },
@@ -139,15 +141,15 @@ export class PointCloudMaterial extends THREE.RawShaderMaterial {
 			clipMethod:			{ type: "i", value: 1 },
 			uShadowColor:		{ type: "3fv", value: [0, 0, 0] },
 
-			uExtraScale:		{ type: "f", value: 1},
-			uExtraOffset:		{ type: "f", value: 0},
+			uExtraScale:		{ type: "f", value: 1 },
+			uExtraOffset:		{ type: "f", value: 0 },
 			uExtraRange:		{ type: "2fv", value: [0, 1] },
 			uExtraGammaBrightContr:	{ type: "3fv", value: [1, 0, 0] },
 
-			uFilterReturnNumberRange:		{ type: "fv", value: [0, 7]},
-			uFilterNumberOfReturnsRange:	{ type: "fv", value: [0, 7]},
-			uFilterGPSTimeClipRange:		{ type: "fv", value: [0, 7]},
-			uFilterPointSourceIDClipRange:		{ type: "fv", value: [0, 65535]},
+			uFilterReturnNumberRange:		{ type: "fv", value: [0, 7] },
+			uFilterNumberOfReturnsRange:	{ type: "fv", value: [0, 7] },
+			uFilterGPSTimeClipRange:		{ type: "fv", value: [0, 7] },
+			uFilterPointSourceIDClipRange:		{ type: "fv", value: [0, 65535] },
 			matcapTextureUniform: 	{ type: "t", value: this.matcapTexture },
 			backfaceCulling: { type: "b", value: false },
 		};
@@ -703,8 +705,8 @@ export class PointCloudMaterial extends THREE.RawShaderMaterial {
 	}
 
 	set elevationRange (value) {
-		let changed = this.uniforms.elevationRange.value[0] !== value[0]
-			|| this.uniforms.elevationRange.value[1] !== value[1];
+		let changed = this.uniforms.elevationRange.value[0] !== value[0] ||
+			this.uniforms.elevationRange.value[1] !== value[1];
 
 		if(changed){
 			this.uniforms.elevationRange.value = value;
@@ -732,6 +734,42 @@ export class PointCloudMaterial extends THREE.RawShaderMaterial {
 
 	set heightMax (value) {
 		this.elevationRange = [this.elevationRange[0], value];
+	}
+
+	get distanceRange() {
+		return this.uniforms.distanceRange.value;
+	}
+
+	set distanceRange(value) {
+		let changed = this.uniforms.distanceRange.value[0] !== value[0] ||
+			this.uniforms.distanceRange.value[1] !== value[1];
+
+		if (changed) {
+			this.uniforms.distanceRange.value = value;
+
+			this._defaultDistanceRangeChanged = true;
+
+			this.dispatchEvent({
+				type: 'material_property_changed',
+				target: this
+			});
+		}
+	}
+
+	get distanceMin() {
+		return this.uniforms.distanceRange.value[0];
+	}
+
+	set distanceMin(value) {
+		this.distanceRange = [value, this.distanceRange[1]];
+	}
+
+	get distanceMax() {
+		return this.uniforms.distanceRange.value[1];
+	}
+
+	set distanceMax(value) {
+		this.distanceRange = [this.distanceRange[0], value];
 	}
 
 	get transition () {

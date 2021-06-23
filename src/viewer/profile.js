@@ -233,10 +233,12 @@ export class ProfileWindow extends EventDispatcher {
 	constructor (viewer) {
 		super();
 
+		this.renderLoop = this.renderLoop.bind(this);
+
 		this.viewer = viewer;
 		this.elRoot = $('#profile_window');
-		this.renderArea = this.elRoot.find('#profileCanvasContainer');
-		this.svg = d3.select('svg#profileSVG');
+		this.renderArea = this.elRoot.find('#profile-canvas-container');
+		this.svg = d3.select('svg#profile-ticks');
 		this.mouseIsDown = false;
 
 		this.projectedBox = new THREE.Box3();
@@ -277,7 +279,7 @@ export class ProfileWindow extends EventDispatcher {
 
 		this.pRenderer = new Renderer(this.renderer);
 
-		this.elRoot.i18n();
+		// this.elRoot.i18n();
 	}
 
 	initListeners () {
@@ -344,7 +346,7 @@ export class ProfileWindow extends EventDispatcher {
 						point.position[2] + closest.pointcloud.position.z
 					]);
 
-					this.elRoot.find('#profileSelectionProperties').fadeIn(200);
+					this.elRoot.find('#profile-selection-properties').fadeIn(200);
 					this.pickSphere.visible = true;
 					this.pickSphere.scale.set(0.5 * radius, 0.5 * radius, 0.5 * radius);
 					this.pickSphere.position.set(point.mileage, 0, position[2]);
@@ -359,65 +361,117 @@ export class ProfileWindow extends EventDispatcher {
 					}
 					
 
-					let info = this.elRoot.find('#profileSelectionProperties');
-					let html = '<table>';
+					if (window.angular) {
+						let info = this.elRoot.find('#profile-selection-properties');
+						let html = '<table>';
+						const trEN = window.angular
+							.element("ng-view")
+							.injector()
+							.get("_translationsEN");
+						const trTR = window.angular
+							.element("ng-view")
+							.injector()
+							.get("_translationsTR");
+						const lang = window.localStorage.getItem("preferredLanguage");
+						const translations = lang === "EN" ? trEN : trTR;
 
-					for (let attributeName of Object.keys(point)) {
+						for (let attributeName of Object.keys(point)) {
 
-						let value = point[attributeName];
-						let attribute = closest.pointcloud.getAttribute(attributeName);
+							let value = point[attributeName];
+							let attribute = closest.pointcloud.getAttribute(attributeName);
 
-						let transform = value => value;
-						if(attribute && attribute.type.size > 4){
-							let range = attribute.initialRange;
-							let scale = 1 / (range[1] - range[0]);
-							let offset = range[0];
-							transform = value => value / scale + offset;
+							let transform = value => value;
+							if(attribute && attribute.type.size > 4){
+								let range = attribute.initialRange;
+								let scale = 1 / (range[1] - range[0]);
+								let offset = range[0];
+								transform = value => value / scale + offset;
+							}
+							
+							if (attributeName === "position") {
+								let values = [...position].map(v => Utils.addCommas(v.toFixed(3)));
+								html += `
+									<tr>
+										<td>x</td>
+										<td>${values[0]}</td>
+									</tr>
+									<tr>
+										<td>y</td>
+										<td>${values[1]}</td>
+									</tr>
+									<tr>
+										<td>z</td>
+										<td>${values[2]}</td>
+									</tr>`;
+							} else if (attributeName === "rgba") {
+								html += `
+									<tr>
+										<td>${translations.resource.profileAttributes[attributeName]}</td>
+										<td>${value.join(", ")}</td>
+									</tr>`;
+							} else if (attributeName === "normal") {
+								continue;
+							} else if (attributeName === "distance") {
+								continue;
+							} else if (attributeName === "mileage") {
+								html += `
+									<tr>
+										<td>${translations.resource.profileAttributes[attributeName]}</td>
+										<td>${value.toFixed(3)}</td>
+									</tr>`;
+							} else {
+								html += `
+									<tr>
+										<td>${translations.resource.profileAttributes[attributeName]}</td>
+										<td>${value}</td>
+									</tr>`;
+							}
 						}
-
-						
-
-						
-
-						if (attributeName === 'position') {
-							let values = [...position].map(v => Utils.addCommas(v.toFixed(3)));
-							html += `
-								<tr>
-									<td>x</td>
-									<td>${values[0]}</td>
-								</tr>
-								<tr>
-									<td>y</td>
-									<td>${values[1]}</td>
-								</tr>
-								<tr>
-									<td>z</td>
-									<td>${values[2]}</td>
-								</tr>`;
-						} else if (attributeName === 'rgba') {
-							html += `
-								<tr>
-									<td>${attributeName}</td>
-									<td>${value.join(', ')}</td>
-								</tr>`;
-						} else if (attributeName === 'normal') {
-							continue;
-						} else if (attributeName === 'mileage') {
-							html += `
-								<tr>
-									<td>${attributeName}</td>
-									<td>${value.toFixed(3)}</td>
-								</tr>`;
-						} else {
-							html += `
-								<tr>
-									<td>${attributeName}</td>
-									<td>${transform(value)}</td>
-								</tr>`;
-						}
+						html += "</table>";
+						info.html(html);
 					}
-					html += '</table>';
-					info.html(html);
+
+						
+
+						// if (attributeName === 'position') {
+						// 	let values = [...position].map(v => Utils.addCommas(v.toFixed(3)));
+						// 	html += `
+						// 		<tr>
+						// 			<td>x</td>
+						// 			<td>${values[0]}</td>
+						// 		</tr>
+						// 		<tr>
+						// 			<td>y</td>
+						// 			<td>${values[1]}</td>
+						// 		</tr>
+						// 		<tr>
+						// 			<td>z</td>
+						// 			<td>${values[2]}</td>
+						// 		</tr>`;
+						// } else if (attributeName === 'rgba') {
+						// 	html += `
+						// 		<tr>
+						// 			<td>${attributeName}</td>
+						// 			<td>${value.join(', ')}</td>
+						// 		</tr>`;
+						// } else if (attributeName === 'normal') {
+						// 	continue;
+						// } else if (attributeName === 'mileage') {
+						// 	html += `
+						// 		<tr>
+						// 			<td>${attributeName}</td>
+						// 			<td>${value.toFixed(3)}</td>
+						// 		</tr>`;
+						// } else {
+						// 	html += `
+						// 		<tr>
+						// 			<td>${attributeName}</td>
+						// 			<td>${transform(value)}</td>
+						// 		</tr>`;
+						// }
+					// }
+					// html += '</table>';
+					// info.html(html);
 
 					this.selectedPoint = point;
 				} else {
@@ -474,9 +528,9 @@ export class ProfileWindow extends EventDispatcher {
 		$(this.renderArea)[0].addEventListener('mousewheel', onWheel, false);
 		$(this.renderArea)[0].addEventListener('DOMMouseScroll', onWheel, false); // Firefox
 
-		$('#closeProfileContainer').click(() => {
-			this.hide();
-		});
+		// $('#closeProfileContainer').click(() => {
+		// 	this.hide();
+		// });
 
 		let getProfilePoints = () => {
 			let points = new Points();
@@ -617,6 +671,144 @@ export class ProfileWindow extends EventDispatcher {
 		}
 	}
 
+  autoSamplePoints() {
+    const sampleCount = 200;
+    const xMin = 0;
+    const xMax = Math.ceil(this.projectedBox.max.x);
+    const zMin = Math.floor(this.projectedBox.min.z);
+    const zMax = Math.ceil(this.projectedBox.max.z);
+
+    const spanSize = (xMax - xMin) / sampleCount;
+
+    const samples = [];
+    for (let currentX = xMin; currentX < xMax; currentX += spanSize) {
+      const spanBox = new THREE.Box2(
+        new THREE.Vector2(currentX, zMin),
+        new THREE.Vector2(currentX + spanSize, zMax)
+      );
+
+      const pointsInsideBox = [];
+
+      for (const [pointcloud, entry] of this.pointclouds) {
+        for (const points of entry.points) {
+          let collisionBox = new THREE.Box2(
+            new THREE.Vector2(
+              points.projectedBox.min.x,
+              points.projectedBox.min.z
+            ),
+            new THREE.Vector2(
+              points.projectedBox.max.x,
+              points.projectedBox.max.z
+            )
+          );
+
+          const intersects = collisionBox.intersectsBox(spanBox);
+
+          if (intersects) {
+            for (let i = 0; i < points.numPoints; i++) {
+              const x = points.data.mileage[i];
+              const z = points.data.position[3 * i + 2];
+
+              if (x < currentX || x >= currentX + spanSize) {
+                continue;
+              }
+
+              pointsInsideBox.push([x, z]);
+            }
+          }
+        }
+      }
+
+      const averageElevation = pointsInsideBox.reduce((el, pt) => {
+        return el + pt[1] / pointsInsideBox.length;
+      }, 0);
+
+      samples.push([currentX + spanSize / 2, averageElevation]);
+    }
+
+    const derivatives = [];
+
+    for (let i = 0; i < samples.length - 1; i++) {
+      const prev = samples[i];
+      const next = samples[i + 1];
+
+      const baseLength = next[0] - prev[0];
+      const elevChange = next[1] - prev[1];
+
+      const derivative = [prev[0], elevChange / baseLength];
+
+      derivatives.push(derivative);
+    }
+
+    for (let i = 1; i < derivatives.length; i++) {
+      const currentDeriv = derivatives[i - 1][1];
+      const nextDeriv = derivatives[i][1];
+
+      const percentChange = (100 * (nextDeriv - currentDeriv)) / currentDeriv;
+
+      if (Math.abs(percentChange) > 50) {
+        this.addPoint(samples[i - 1][0], samples[i - 1][1]);
+      }
+    }
+
+    this.render();
+  }
+
+  addPoint(x, z) {
+    const sg = new THREE.SphereGeometry(1, 16, 16);
+    const sm = new THREE.MeshLambertMaterial({
+      // color: 0xff9e1b // <3 papaya
+      color: 0x4606ff,
+    });
+
+    const newSelectedSphere = new THREE.Mesh(sg, sm);
+    newSelectedSphere.position.set(x, 0, z);
+
+    this.selectedPointsContainer.add(newSelectedSphere);
+    this.selectedPoints.push(newSelectedSphere);
+
+    this.dispatchEvent({
+      type: "point_selected",
+      point: newSelectedSphere,
+    });
+  }
+
+  removePoint(sphere) {
+    if (!this.selectedPointsContainer.children.includes(sphere)) {
+      return;
+    }
+
+    this.selectedPointsContainer.remove(sphere);
+
+    const index = this.selectedPoints.indexOf((e) => e === sphere);
+
+    this.selectedPoints.splice(index, 1);
+
+    this.render();
+
+    this.dispatchEvent({
+      type: "point_removed",
+      point: sphere,
+    });
+  }
+
+  resetPoints() {
+    this.selectedPoints.forEach((sphere) => {
+      if (!this.selectedPointsContainer.children.includes(sphere)) {
+        return;
+      }
+
+      this.selectedPointsContainer.remove(sphere);
+    });
+    this.selectedPoints.length = 0;
+
+    this.render();
+
+    this.dispatchEvent({
+      type: "point_reset",
+    });
+  }
+
 	initTHREE () {
 		this.renderer = new THREE.WebGLRenderer({alpha: true, premultipliedAlpha: false});
 		this.renderer.setClearColor(0x000000, 0);
@@ -659,6 +851,13 @@ export class ProfileWindow extends EventDispatcher {
 		this.scene.add(this.pickSphere);
 
 		this.viewerPickSphere = new THREE.Mesh(sg, sm);
+
+    this.selectedPointsContainer = new THREE.Object3D();
+    this.selectedPoints = [];
+    this.hoveredSphere = null;
+    this.raycasterMouse = new THREE.Vector2();
+
+		this.scene.add(this.selectedPointsContainer);
 	}
 
 	initSVG () {
@@ -668,26 +867,24 @@ export class ProfileWindow extends EventDispatcher {
 
 		this.svg.selectAll('*').remove();
 
-		this.scaleX = d3.scale.linear()
+		this.scaleX = d3.scaleLinear()
 			.domain([this.camera.left + this.camera.position.x, this.camera.right + this.camera.position.x])
 			.range([0, width]);
-		this.scaleY = d3.scale.linear()
+		this.scaleY = d3.scaleLinear()
 			.domain([this.camera.bottom + this.camera.position.z, this.camera.top + this.camera.position.z])
 			.range([height, 0]);
 
-		this.xAxis = d3.svg.axis()
+		this.xAxis = d3.axisBottom()
 			.scale(this.scaleX)
-			.orient('bottom')
-			.innerTickSize(-height)
-			.outerTickSize(1)
+			.tickSizeInner(-height)
+			.tickSizeOuter(1)
 			.tickPadding(10)
 			.ticks(width / 50);
 
-		this.yAxis = d3.svg.axis()
+		this.yAxis = d3.axisLeft()
 			.scale(this.scaleY)
-			.orient('left')
-			.innerTickSize(-width)
-			.outerTickSize(1)
+			.tickSizeInner(-width)
+			.tickSizeOuter(1)
 			.tickPadding(10)
 			.ticks(height / 20);
 
@@ -786,12 +983,14 @@ export class ProfileWindow extends EventDispatcher {
 	}
 
 	show () {
-		this.elRoot.fadeIn();
+		// this.elRoot.fadeIn();
+		this.elRoot[0].style.visibility = 'visible';
 		this.enabled = true;
 	}
 
 	hide () {
-		this.elRoot.fadeOut();
+		// this.elRoot.fadeOut();
+		this.elRoot[0].style.visibility = 'hidden'
 		this.enabled = false;
 	}
 
@@ -819,15 +1018,13 @@ export class ProfileWindow extends EventDispatcher {
 		let marginLeft = this.renderArea[0].offsetLeft;
 
 		this.xAxis.scale(this.scaleX)
-			.orient('bottom')
-			.innerTickSize(-height)
-			.outerTickSize(1)
+			.tickSizeInner(-height)
+			.tickSizeOuter(1)
 			.tickPadding(10)
 			.ticks(width / 50);
 		this.yAxis.scale(this.scaleY)
-			.orient('left')
-			.innerTickSize(-width)
-			.outerTickSize(1)
+			.tickSizeInner(-width)
+			.tickSizeOuter(1)
 			.tickPadding(10)
 			.ticks(height / 20);
 
@@ -896,6 +1093,39 @@ export class ProfileWindow extends EventDispatcher {
 		renderer.render(scene, camera);
 
 		this.requestScaleUpdate();
+	}
+
+	renderLoop() {
+    if (this.enabled) {
+			const black = new THREE.Color(0x000000);
+			const papaya = new THREE.Color(0xff9e1b);
+			const red = new THREE.Color(0xdd1111);
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(this.raycasterMouse, this.camera);
+      raycaster.ray.origin.y = -1000;
+
+      const intersects = raycaster.intersectObjects(
+        this.selectedPointsContainer.children
+      );
+
+      if (intersects.length > 0) {
+        if (this.hoveredSphere !== intersects[0].object) {
+          if (this.hoveredSphere !== null) {
+            this.hoveredSphere.material.emissive = black;
+          }
+          intersects[0].object.material.emissive = red;
+          this.hoveredSphere = intersects[0].object;
+        }
+      } else {
+        if (this.hoveredSphere !== null) {
+          this.hoveredSphere.material.emissive = black;
+        }
+        this.hoveredSphere = null;
+      }
+      this.render();
+
+      window.requestAnimationFrame(this.renderLoop);
+    }
 	}
 };
 
@@ -1103,4 +1333,5 @@ export class ProfileWindowController {
 			this.requests.push(request);
 		}
 	}
+
 };

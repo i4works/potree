@@ -143,6 +143,29 @@ let Gradients = {
 		[0.04, new THREE.Color(1, 1, 1)],
 		[1.00, new THREE.Color(1, 1, 1)]
 	],
+	DISTANCE: [
+		[0.0, new THREE.Color("hsl(240, 100%, 50%)")],
+		[0.05, new THREE.Color("hsl(228, 100%, 50%)")],
+		[0.10, new THREE.Color("hsl(216, 100%, 50%)")],
+		[0.15, new THREE.Color("hsl(204, 100%, 50%)")],
+		[0.20, new THREE.Color("hsl(192, 100%, 50%)")],
+		[0.25, new THREE.Color("hsl(180, 100%, 50%)")],
+		[0.30, new THREE.Color("hsl(168, 100%, 50%)")],
+		[0.35, new THREE.Color("hsl(156, 100%, 50%)")],
+		[0.40, new THREE.Color("hsl(144, 100%, 50%)")],
+		[0.45, new THREE.Color("hsl(132, 100%, 50%)")],
+		[0.50, new THREE.Color("hsl(120, 100%, 50%)")],
+		[0.55, new THREE.Color("hsl(108, 100%, 50%)")],
+		[0.60, new THREE.Color("hsl(96, 100%, 50%)")],
+		[0.65, new THREE.Color("hsl(84, 100%, 50%)")],
+		[0.70, new THREE.Color("hsl(72, 100%, 50%)")],
+		[0.75, new THREE.Color("hsl(60, 100%, 50%)")],
+		[0.80, new THREE.Color("hsl(48, 100%, 50%)")],
+		[0.85, new THREE.Color("hsl(36, 100%, 50%)")],
+		[0.90, new THREE.Color("hsl(24, 100%, 50%)")],
+		[0.95, new THREE.Color("hsl(12, 100%, 50%)")],
+		[0.1, new THREE.Color("hsl(0, 100%, 50%)")],
+	]
 };
 
 

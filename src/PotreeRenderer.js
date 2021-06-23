@@ -151,6 +151,7 @@ let attributeLocations = {
 	"spacing": {name: "spacing", location: 9},
 	"gps-time":  {name: "gpsTime", location: 10},
 	"aExtra":  {name: "aExtra", location: 11},
+	"distance": {name :"distance", location: 12}
 };
 
 class Shader {
@@ -1257,6 +1258,13 @@ export class Renderer {
 
 				const lClipBoxes = shader.uniformLocations["clipBoxes[0]"];
 				gl.uniformMatrix4fv(lClipBoxes, false, material.uniforms.clipBoxes.value);
+
+				const flattenedColors = [].concat(
+					...material.clipBoxes.map(c => c.color.toArray())
+				);
+
+				const lClipBoxColors = shader.uniformLocations["clipBoxColors[0]"];
+				gl.uniform3fv(lClipBoxColors, flattenedColors);
 			}
 
 			// TODO CLIPSPHERES
@@ -1306,7 +1314,7 @@ export class Renderer {
 
 			shader.setUniform2f("elevationRange", material.elevationRange);
 			shader.setUniform2f("intensityRange", material.intensityRange);
-
+			shader.setUniform2f("distanceRange", material.distanceRange);
 
 			shader.setUniform3f("uIntensity_gbc", [
 				material.intensityGamma, 
