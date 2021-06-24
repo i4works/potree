@@ -441,6 +441,7 @@ export class ProfileWindow extends EventDispatcher {
 										<td>${value.toFixed(3)}</td>
 									</tr>`;
 							} else {
+								continue;
 								html += `
 									<tr>
 										<td>${translations.resource.profileAttributes[attributeName]}</td>

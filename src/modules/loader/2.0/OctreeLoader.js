@@ -106,7 +106,7 @@ export class NodeLoader{
 				}
 				// indices ??
 
-				let numPoints = e.data.buffer.byteLength / node.pcoGeometry.pointAttributes.byteSize;
+				let numPoints = e.data.buffer.byteLength / node.octreeGeometry.pointAttributes.byteSize;
 
 				const colorBuffer = new Uint8Array(buffers.rgba.buffer);
 				const distanceBuffer = new Float32Array(numPoints);
