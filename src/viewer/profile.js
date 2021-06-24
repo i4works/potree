@@ -241,6 +241,8 @@ export class ProfileWindow extends EventDispatcher {
 		this.svg = d3.select('svg#profile-ticks');
 		this.mouseIsDown = false;
 
+		this.CSVExporter = CSVExporter;
+
 		this.projectedBox = new THREE.Box3();
 		this.pointclouds = new Map();
 		this.numPoints = 0;
@@ -306,6 +308,20 @@ export class ProfileWindow extends EventDispatcher {
 			this.viewerPickSphere.scale.set(scale, scale, scale);
 		};
 
+    this.renderArea.click((e) => {
+      if (this.hoveredSphere) {
+        this.removePoint(this.hoveredSphere);
+      } else {
+        if (this.scene.children.includes(this.pickSphere)) {
+          const { x, z } = this.pickSphere.position;
+
+          this.addPoint(x, z);
+
+          this.render();
+        }
+      }
+    });
+
 		this.renderArea.mousemove(e => {
 			if (this.pointclouds.size === 0) {
 				return;
@@ -330,6 +346,11 @@ export class ProfileWindow extends EventDispatcher {
 
 				this.render();
 			} else if (this.pointclouds.size > 0) {
+        this.raycasterMouse.set(
+          (x / rect.width) * 2 - 1,
+          -(y / rect.height) * 2 + 1
+        );
+
 				// FIND HOVERED POINT
 				let radius = Math.abs(this.scaleX.invert(0) - this.scaleX.invert(40));
 				let mileage = this.scaleX.invert(newMouse.x);
@@ -430,48 +451,6 @@ export class ProfileWindow extends EventDispatcher {
 						html += "</table>";
 						info.html(html);
 					}
-
-						
-
-						// if (attributeName === 'position') {
-						// 	let values = [...position].map(v => Utils.addCommas(v.toFixed(3)));
-						// 	html += `
-						// 		<tr>
-						// 			<td>x</td>
-						// 			<td>${values[0]}</td>
-						// 		</tr>
-						// 		<tr>
-						// 			<td>y</td>
-						// 			<td>${values[1]}</td>
-						// 		</tr>
-						// 		<tr>
-						// 			<td>z</td>
-						// 			<td>${values[2]}</td>
-						// 		</tr>`;
-						// } else if (attributeName === 'rgba') {
-						// 	html += `
-						// 		<tr>
-						// 			<td>${attributeName}</td>
-						// 			<td>${value.join(', ')}</td>
-						// 		</tr>`;
-						// } else if (attributeName === 'normal') {
-						// 	continue;
-						// } else if (attributeName === 'mileage') {
-						// 	html += `
-						// 		<tr>
-						// 			<td>${attributeName}</td>
-						// 			<td>${value.toFixed(3)}</td>
-						// 		</tr>`;
-						// } else {
-						// 	html += `
-						// 		<tr>
-						// 			<td>${attributeName}</td>
-						// 			<td>${transform(value)}</td>
-						// 		</tr>`;
-						// }
-					// }
-					// html += '</table>';
-					// info.html(html);
 
 					this.selectedPoint = point;
 				} else {
@@ -706,8 +685,9 @@ export class ProfileWindow extends EventDispatcher {
 
           if (intersects) {
             for (let i = 0; i < points.numPoints; i++) {
+
               const x = points.data.mileage[i];
-              const z = points.data.position[3 * i + 2];
+              const z = points.data.position[3 * i + 2] + entry.trueOctree.position.z;
 
               if (x < currentX || x >= currentX + spanSize) {
                 continue;
@@ -793,14 +773,14 @@ export class ProfileWindow extends EventDispatcher {
   }
 
   resetPoints() {
-    this.selectedPoints.forEach((sphere) => {
-      if (!this.selectedPointsContainer.children.includes(sphere)) {
-        return;
-      }
+		while (this.selectedPoints.length) {
+			const sphere = this.selectedPoints.pop();
+			if (!this.selectedPointsContainer.children.includes(sphere)) {
+				continue;
+			}
 
-      this.selectedPointsContainer.remove(sphere);
-    });
-    this.selectedPoints.length = 0;
+			this.selectedPointsContainer.remove(sphere);
+		}
 
     this.render();
 
@@ -844,6 +824,14 @@ export class ProfileWindow extends EventDispatcher {
 
 		this.scene = new THREE.Scene();
 		this.profileScene = new THREE.Scene();
+		
+    this.light = new THREE.DirectionalLight(0xffffff, 1);
+    this.light.position.set(0, 0, 1);
+
+    const ambientLight = new THREE.AmbientLight(0xdedede);
+
+    this.scene.add(this.light);
+    this.scene.add(ambientLight);
 
 		let sg = new THREE.SphereGeometry(1, 16, 16);
 		let sm = new THREE.MeshNormalMaterial();

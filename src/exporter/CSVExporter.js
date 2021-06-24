@@ -24,6 +24,8 @@ export class CSVExporter {
 				for (let i = 0; i < itemSize; i++) {
 					headerValues.push(`${attribute}_${i}`);
 				}
+			} else if (attribute === 'distance') {
+				continue;
 			} else {
 				headerValues.push(attribute);
 			}
@@ -34,6 +36,9 @@ export class CSVExporter {
 			let values = [];
 
 			for (let attribute of attributes) {
+				if (attribute === 'distance') {
+					continue;
+				}
 				let itemSize = points.data[attribute].length / points.numPoints;
 				let value = points.data[attribute]
 					.subarray(itemSize * i, itemSize * i + itemSize)
