@@ -133,10 +133,6 @@ export class NodeLoader{
 					geometry.setAttribute('distance', new THREE.BufferAttribute(distanceBuffer, 1));
 				}
 
-				node.listeners.forEach(fn => {
-						fn();
-				});
-
 				node.density = data.density;
 				node.geometry = geometry;
 				node.loaded = true;

@@ -27,7 +27,6 @@ export class OctreeGeometryNode{
 		this.numPoints = 0;
 		this.level = null;
 		this.oneTimeDisposeHandlers = [];
-		this.listeners = [];
 	}
 
 	isGeometryNode(){
@@ -76,7 +75,7 @@ export class OctreeGeometryNode{
 			return;
 		}
 
-		this.octreeGeometry.loader.load(this);
+		return this.octreeGeometry.loader.load(this);
 	}
 
 	getNumPoints(){
@@ -97,11 +96,6 @@ export class OctreeGeometryNode{
 			this.oneTimeDisposeHandlers = [];
 		}
 	}
-
-	addLoadListener(fn){
-		this.listeners.push(fn);
-	}
-
 };
 
 OctreeGeometryNode.IDCount = 0;
