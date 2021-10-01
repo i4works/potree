@@ -1,7 +1,7 @@
 
 import * as THREE from "../../../../libs/three.js/build/three.module.js";
-import {PointAttribute, PointAttributes, PointAttributeTypes} from "../../../loader/PointAttributes.js";
-import {OctreeGeometry, OctreeGeometryNode} from "./OctreeGeometry.js";
+import { PointAttribute, PointAttributes, PointAttributeTypes } from "../../../loader/PointAttributes.js";
+import { OctreeGeometry, OctreeGeometryNode } from "./OctreeGeometry.js";
 
 // let loadedNodes = new Set();
 
@@ -132,6 +132,10 @@ export class NodeLoader{
 
 					geometry.setAttribute('distance', new THREE.BufferAttribute(distanceBuffer, 1));
 				}
+
+				node.listeners.forEach(fn => {
+						fn();
+				});
 
 				node.density = data.density;
 				node.geometry = geometry;
