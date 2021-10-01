@@ -2,8 +2,8 @@
 
 import * as THREE from "../libs/three.js/build/three.module.js";
 import {PointCloudTreeNode} from "./PointCloudTree.js";
-import {XHRFactory} from "./XHRFactory.js";
 import {Utils} from "./utils.js";
+import {XHRFactory} from "./XHRFactory.js";
 
 export class PointCloudOctreeGeometry{
 
@@ -38,6 +38,7 @@ export class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
 		this.level = null;
 		this.loaded = false;
 		this.oneTimeDisposeHandlers = [];
+		this.listeners = [];
 	}
 
 	isGeometryNode(){
@@ -264,6 +265,9 @@ export class PointCloudOctreeGeometryNode extends PointCloudTreeNode{
 		}
 	}
 	
+	addLoadListener(fn){
+		this.listeners.push(fn);
+	};
 }
 
 PointCloudOctreeGeometryNode.IDCount = 0;
