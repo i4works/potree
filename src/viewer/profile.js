@@ -1,14 +1,14 @@
 
 import * as THREE from "../../libs/three.js/build/three.module.js";
-import {PointSizeType} from "../defines.js";
-import {EventDispatcher} from "../EventDispatcher.js";
-import {CSVExporter} from "../exporter/CSVExporter.js";
-import {LASExporter} from "../exporter/LASExporter.js";
-import {PointCloudMaterial} from "../materials/PointCloudMaterial.js";
-import {PointCloudTree} from "../PointCloudTree.js";
-import {Points} from "../Points.js";
-import {Renderer} from "../PotreeRenderer.js";
-import {Utils} from "../utils.js";
+import { PointSizeType } from "../defines.js";
+import { EventDispatcher } from "../EventDispatcher.js";
+import { CSVExporter } from "../exporter/CSVExporter.js";
+import { LASExporter } from "../exporter/LASExporter.js";
+import { PointCloudMaterial } from "../materials/PointCloudMaterial.js";
+import { PointCloudTree } from "../PointCloudTree.js";
+import { Points } from "../Points.js";
+import { Renderer } from "../PotreeRenderer.js";
+import { Utils } from "../utils.js";
 
 
 function copyMaterial(source, target){
@@ -306,7 +306,6 @@ export class ProfileWindow extends EventDispatcher {
 			let pr = Utils.projectedRadius(1, camera, distance, domElement.clientWidth, domElement.clientHeight);
 			let scale = (10 / pr);
 
-			console.log('picksphere', scale);
 			this.viewerPickSphere.scale.set(scale, scale, scale);
 		};
 
