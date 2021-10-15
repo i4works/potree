@@ -1,14 +1,14 @@
 
 import * as THREE from "../../libs/three.js/build/three.module.js";
-import {Utils} from "../utils.js";
-import {Points} from "../Points.js";
+import {PointSizeType} from "../defines.js";
+import {EventDispatcher} from "../EventDispatcher.js";
 import {CSVExporter} from "../exporter/CSVExporter.js";
 import {LASExporter} from "../exporter/LASExporter.js";
-import { EventDispatcher } from "../EventDispatcher.js";
-import {PointCloudTree} from "../PointCloudTree.js";
-import {Renderer} from "../PotreeRenderer.js";
 import {PointCloudMaterial} from "../materials/PointCloudMaterial.js";
-import {PointSizeType} from "../defines.js";
+import {PointCloudTree} from "../PointCloudTree.js";
+import {Points} from "../Points.js";
+import {Renderer} from "../PotreeRenderer.js";
+import {Utils} from "../utils.js";
 
 
 function copyMaterial(source, target){
@@ -305,8 +305,17 @@ export class ProfileWindow extends EventDispatcher {
 			let distance = this.viewerPickSphere.position.distanceTo(camera.position);
 			let pr = Utils.projectedRadius(1, camera, distance, domElement.clientWidth, domElement.clientHeight);
 			let scale = (10 / pr);
+
+			console.log('picksphere', scale);
 			this.viewerPickSphere.scale.set(scale, scale, scale);
 		};
+
+		let pointSphereSizeHandler = () => {
+		};
+
+		if(!this.viewer.hasEventListener("update", pointSphereSizeHandler)){
+			this.viewer.addEventListener("update", pointSphereSizeHandler);
+		}
 
     this.renderArea.click((e) => {
       if (this.hoveredSphere) {
@@ -501,6 +510,13 @@ export class ProfileWindow extends EventDispatcher {
 
 			this.camera.position.x -= ncPos[0] - cPos[0];
 			this.camera.position.z -= ncPos[1] - cPos[1];
+
+			this.selectedPoints.forEach((sphere) => {
+				let radius = Math.abs(this.scaleX.invert(0) - this.scaleX.invert(40));
+				const scale = 0.5 * radius;
+
+				sphere.scale.set(scale, scale, scale);
+			});
 
 			this.render();
 			this.updateScales();
@@ -736,7 +752,7 @@ export class ProfileWindow extends EventDispatcher {
   }
 
   addPoint(x, z) {
-    const sg = new THREE.SphereGeometry(1, 16, 16);
+    const sg = new THREE.SphereGeometry(0.2, 16, 16);
     const sm = new THREE.MeshLambertMaterial({
       // color: 0xff9e1b // <3 papaya
       color: 0x4606ff,
