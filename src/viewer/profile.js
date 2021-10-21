@@ -1,14 +1,14 @@
 
 import * as THREE from "../../libs/three.js/build/three.module.js";
-import {PointSizeType} from "../defines.js";
-import {EventDispatcher} from "../EventDispatcher.js";
-import {CSVExporter} from "../exporter/CSVExporter.js";
-import {LASExporter} from "../exporter/LASExporter.js";
-import {PointCloudMaterial} from "../materials/PointCloudMaterial.js";
-import {PointCloudTree} from "../PointCloudTree.js";
-import {Points} from "../Points.js";
-import {Renderer} from "../PotreeRenderer.js";
-import {Utils} from "../utils.js";
+import { PointSizeType } from "../defines.js";
+import { EventDispatcher } from "../EventDispatcher.js";
+import { CSVExporter } from "../exporter/CSVExporter.js";
+import { LASExporter } from "../exporter/LASExporter.js";
+import { PointCloudMaterial } from "../materials/PointCloudMaterial.js";
+import { PointCloudTree } from "../PointCloudTree.js";
+import { Points } from "../Points.js";
+import { Renderer } from "../PotreeRenderer.js";
+import { Utils } from "../utils.js";
 
 
 function copyMaterial(source, target){
@@ -774,6 +774,13 @@ export class ProfileWindow extends EventDispatcher {
       type: "point_selected",
       point: newSelectedSphere,
     });
+
+		this.selectedPoints.forEach((sphere) => {
+			let radius = Math.abs(this.scaleX.invert(0) - this.scaleX.invert(40));
+			const scale = 0.5 * radius;
+
+			sphere.scale.set(scale, scale, scale);
+		});
   }
 
   removePoint(sphere) {
