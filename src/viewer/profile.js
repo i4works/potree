@@ -1,14 +1,14 @@
 
 import * as THREE from "../../libs/three.js/build/three.module.js";
-import { PointSizeType } from "../defines.js";
-import { EventDispatcher } from "../EventDispatcher.js";
-import { CSVExporter } from "../exporter/CSVExporter.js";
-import { LASExporter } from "../exporter/LASExporter.js";
-import { PointCloudMaterial } from "../materials/PointCloudMaterial.js";
-import { PointCloudTree } from "../PointCloudTree.js";
-import { Points } from "../Points.js";
-import { Renderer } from "../PotreeRenderer.js";
-import { Utils } from "../utils.js";
+import {PointSizeType} from "../defines.js";
+import {EventDispatcher} from "../EventDispatcher.js";
+import {CSVExporter} from "../exporter/CSVExporter.js";
+import {LASExporter} from "../exporter/LASExporter.js";
+import {PointCloudMaterial} from "../materials/PointCloudMaterial.js";
+import {PointCloudTree} from "../PointCloudTree.js";
+import {Points} from "../Points.js";
+import {Renderer} from "../PotreeRenderer.js";
+import {Utils} from "../utils.js";
 
 
 function copyMaterial(source, target){
@@ -369,11 +369,18 @@ export class ProfileWindow extends EventDispatcher {
 				if (closest) {
 					let point = closest.point;
 
+
 					let position = new Float64Array([
 						point.position[0] + closest.pointcloud.position.x,
 						point.position[1] + closest.pointcloud.position.y,
 						point.position[2] + closest.pointcloud.position.z
 					]);
+					let projectedPosition; 
+
+					if (this.viewer.displayProjection && !!closest.pointcloud.projection) {
+						const projectedXY = proj4(closest.pointcloud.projection, this.viewer.displayProjection, [position[0], position[1]]);
+						projectedPosition = [...projectedXY, position[2]];
+					}
 
 					this.elRoot.find('#profile-selection-properties').fadeIn(200);
 					this.pickSphere.visible = true;
@@ -418,7 +425,7 @@ export class ProfileWindow extends EventDispatcher {
 							}
 							
 							if (attributeName === "position") {
-								let values = [...position].map(v => Utils.addCommas(v.toFixed(3)));
+								let values = [...(projectedPosition || position)].map(v => Utils.addCommas(v.toFixed(3)));
 								html += `
 									<tr>
 										<td>x</td>

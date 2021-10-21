@@ -1,10 +1,10 @@
 
 import * as THREE from "../../libs/three.js/build/three.module.js";
-import {TextSprite} from "../TextSprite.js";
-import {Utils} from "../utils.js";
 import {Line2} from "../../libs/three.js/lines/Line2.js";
 import {LineGeometry} from "../../libs/three.js/lines/LineGeometry.js";
 import {LineMaterial} from "../../libs/three.js/lines/LineMaterial.js";
+import {TextSprite} from "../TextSprite.js";
+import {Utils} from "../utils.js";
 
 function createHeightLine(){
 	let lineGeometry = new LineGeometry();
@@ -285,6 +285,7 @@ export class Measure extends THREE.Object3D {
 		super();
 
 		this.constructor.counter = (this.constructor.counter === undefined) ? 0 : this.constructor.counter + 1;
+		this.projection = null;
 
 		this.name = 'Measure_' + this.constructor.counter;
 		this.points = [];
@@ -329,6 +330,11 @@ export class Measure extends THREE.Object3D {
 
 		this.add(this.azimuth.node);
 
+	}
+
+	setProjection (wkt) {
+		// no need to validate as only class itself sets it which gets it from the pointcloud
+		this.projection = wkt;
 	}
 
 	createSphereMaterial () {
@@ -439,6 +445,7 @@ export class Measure extends THREE.Object3D {
 						}
 
 						this.setPosition(i, I.location);
+						if (!!I.pointcloud.projection) this.setProjection(I.pointcloud.projection);
 					}
 				}
 			};
@@ -614,7 +621,13 @@ export class Measure extends THREE.Object3D {
 			{ // coordinate labels
 				let coordinateLabel = this.coordinateLabels[0];
 				
-				let msg = position.toArray().map(p => Utils.addCommas(p.toFixed(2))).join(" / ");
+				const posArray = position.toArray();
+				if (window.viewer && window.viewer.displayProjection && this.projection) {
+					const xy = proj4(this.projection, window.viewer.displayProjection, [posArray[0], posArray[1]]);
+					posArray[0] = xy[0];
+					posArray[1] = xy[1];
+				}
+				let msg = posArray.map(p => Utils.addCommas(p.toFixed(2))).join(" / ");
 				coordinateLabel.setText(msg);
 
 				coordinateLabel.visible = this.showCoordinates;

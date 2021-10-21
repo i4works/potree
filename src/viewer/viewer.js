@@ -1,39 +1,37 @@
 
+import JSON5 from "../../libs/json5-2.1.3/json5.mjs";
 import * as THREE from "../../libs/three.js/build/three.module.js";
-import {ClipTask, ClipMethod, CameraMode, LengthUnits, ElevationGradientRepeat} from "../defines.js";
+import {VRButton} from '../../libs/three.js/extra/VRButton.js';
+import {CameraMode, ClipMethod, ClipTask, ElevationGradientRepeat, LengthUnits} from "../defines.js";
+import {EventDispatcher} from "../EventDispatcher.js";
+import {Features} from "../Features.js";
+import {ClassificationScheme} from "../materials/ClassificationScheme.js";
+import {DeviceOrientationControls} from "../navigation/DeviceOrientationControls.js";
+import {EarthControls} from "../navigation/EarthControls.js";
+import {FirstPersonControls} from "../navigation/FirstPersonControls.js";
+import {InputHandler} from "../navigation/InputHandler.js";
+import {OrbitControls} from "../navigation/OrbitControls.js";
+import {VRControls} from "../navigation/VRControls.js";
 import {Renderer} from "../PotreeRenderer.js";
-import {PotreeRenderer} from "./PotreeRenderer.js";
+import {Utils} from "../utils.js";
+import {AnnotationTool} from "../utils/AnnotationTool.js";
+import {ClippingTool} from "../utils/ClippingTool.js";
+import {Compass} from "../utils/Compass.js";
+import {MeasuringTool} from "../utils/MeasuringTool.js";
+import {Message} from "../utils/Message.js";
+import {ProfileTool} from "../utils/ProfileTool.js";
+import {TransformationTool} from "../utils/TransformationTool.js";
+import {BoxVolume} from "../utils/Volume.js";
+import {VolumeTool} from "../utils/VolumeTool.js";
 import {EDLRenderer} from "./EDLRenderer.js";
 import {HQSplatRenderer} from "./HQSplatRenderer.js";
-import {Scene} from "./Scene.js";
-import {ClippingTool} from "../utils/ClippingTool.js";
-import {TransformationTool} from "../utils/TransformationTool.js";
-import {Utils} from "../utils.js";
-import {MapView} from "./map.js";
-import {ProfileWindow, ProfileWindowController} from "./profile.js";
-import {BoxVolume} from "../utils/Volume.js";
-import {Features} from "../Features.js";
-import {Message} from "../utils/Message.js";
-import {Sidebar} from "./sidebar.js";
-
-import {AnnotationTool} from "../utils/AnnotationTool.js";
-import {MeasuringTool} from "../utils/MeasuringTool.js";
-import {ProfileTool} from "../utils/ProfileTool.js";
-import {VolumeTool} from "../utils/VolumeTool.js";
-
-import {InputHandler} from "../navigation/InputHandler.js";
 import {NavigationCube} from "./NavigationCube.js";
-import {Compass} from "../utils/Compass.js";
-import {OrbitControls} from "../navigation/OrbitControls.js";
-import {FirstPersonControls} from "../navigation/FirstPersonControls.js";
-import {EarthControls} from "../navigation/EarthControls.js";
-import {DeviceOrientationControls} from "../navigation/DeviceOrientationControls.js";
-import {VRControls} from "../navigation/VRControls.js";
-import { EventDispatcher } from "../EventDispatcher.js";
-import { ClassificationScheme } from "../materials/ClassificationScheme.js";
-import { VRButton } from '../../libs/three.js/extra/VRButton.js';
+import {PotreeRenderer} from "./PotreeRenderer.js";
+import {ProfileWindow, ProfileWindowController} from "./profile.js";
+import {Scene} from "./Scene.js";
 
-import JSON5 from "../../libs/json5-2.1.3/json5.mjs";
+
+
 
 
 export class Viewer extends EventDispatcher{
@@ -47,6 +45,7 @@ export class Viewer extends EventDispatcher{
 
 		this.onVrListeners = [];
 
+		this.displayProjection = null;
 		this.messages = [];
 		this.elMessages = $(`
 		<div id="message_listing" 
@@ -378,6 +377,11 @@ export class Viewer extends EventDispatcher{
 	// ------------------------------------------------------------------------------------
 	// Viewer API
 	// ------------------------------------------------------------------------------------
+
+	setDisplayProjection (wkt) {
+		// TODO validate with proj4
+		this.displayProjection = wkt;
+	}
 
 	setScene (scene) {
 		if (scene === this.scene) {
