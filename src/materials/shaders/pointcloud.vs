@@ -8,6 +8,7 @@ precision highp int;
 attribute vec3 position;
 attribute vec3 color;
 attribute float distance;
+attribute float difference;
 attribute float intensity;
 attribute float classification;
 attribute float returnNumber;
@@ -409,7 +410,7 @@ vec3 getRGB(){
 }
 
 vec3 getDistance() {
-  float w = (distance - distanceRange.x) / (distanceRange.y - distanceRange.x);
+  float w = (difference - distanceRange.x) / (distanceRange.y - distanceRange.x);
 	clamp(w, 0.0, 1.0);
 
 	vec3 cDistance = texture2D(gradient, vec2(w, 1.0-w)).rgb;

@@ -1,9 +1,9 @@
 
 import * as THREE from "../libs/three.js/build/three.module.js";
-import {PointCloudTree, PointCloudTreeNode} from "./PointCloudTree.js";
-import {PointCloudOctreeGeometryNode} from "./PointCloudOctreeGeometry.js";
-import {Utils} from "./utils.js";
-import {PointCloudMaterial} from "./materials/PointCloudMaterial.js";
+import { PointCloudMaterial } from "./materials/PointCloudMaterial.js";
+import { PointCloudOctreeGeometryNode } from "./PointCloudOctreeGeometry.js";
+import { PointCloudTree, PointCloudTreeNode } from "./PointCloudTree.js";
+import { Utils } from "./utils.js";
 
 
 export class PointCloudOctreeNode extends PointCloudTreeNode {

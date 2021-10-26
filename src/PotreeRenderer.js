@@ -1,9 +1,7 @@
 
 import * as THREE from "../libs/three.js/build/three.module.js";
+import {ClipTask, ElevationGradientRepeat, PointSizeType} from "./defines.js";
 import {PointCloudTree} from "./PointCloudTree.js";
-import {PointCloudOctreeNode} from "./PointCloudOctree.js";
-import {PointCloudArena4DNode} from "./arena4d/PointCloudArena4D.js";
-import {PointSizeType, ClipTask, ElevationGradientRepeat} from "./defines.js";
 
 // Copied from three.js: WebGLRenderer.js
 function paramThreeToGL(_gl, p) {
@@ -151,7 +149,8 @@ let attributeLocations = {
 	"spacing": {name: "spacing", location: 9},
 	"gps-time":  {name: "gpsTime", location: 10},
 	"aExtra":  {name: "aExtra", location: 11},
-	"distance": {name :"distance", location: 12}
+	"distance": {name :"distance", location: 12},
+	"difference": {name:"difference", location: 13}
 };
 
 class Shader {
