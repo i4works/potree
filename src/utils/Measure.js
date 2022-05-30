@@ -14,11 +14,11 @@ function createHeightLine(){
 		0, 0, 0,
 	]);
 
-	let lineMaterial = new LineMaterial({ 
-		color: 0x00ff00, 
-		dashSize: 5, 
+	let lineMaterial = new LineMaterial({
+		color: 0x00ff00,
+		dashSize: 5,
 		gapSize: 2,
-		linewidth: 2, 
+		linewidth: 2,
 		resolution:  new THREE.Vector2(1000, 1000),
 	});
 
@@ -27,7 +27,7 @@ function createHeightLine(){
 	heightEdge.visible = false;
 
 	//this.add(this.heightEdge);
-	
+
 	return heightEdge;
 }
 
@@ -55,7 +55,7 @@ function createAreaLabel(){
 	areaLabel.material.depthTest = false;
 	areaLabel.material.opacity = 1;
 	areaLabel.visible = false;
-	
+
 	return areaLabel;
 }
 
@@ -69,7 +69,7 @@ function createCircleRadiusLabel(){
 	circleRadiusLabel.material.depthTest = false;
 	circleRadiusLabel.material.opacity = 1;
 	circleRadiusLabel.visible = false;
-	
+
 	return circleRadiusLabel;
 }
 
@@ -81,9 +81,9 @@ function createCircleRadiusLine(){
 		0, 0, 0,
 	]);
 
-	const lineMaterial = new LineMaterial({ 
-		color: 0xff0000, 
-		linewidth: 2, 
+	const lineMaterial = new LineMaterial({
+		color: 0xff0000,
+		linewidth: 2,
 		resolution:  new THREE.Vector2(1000, 1000),
 		gapSize: 1,
 		dashed: true,
@@ -106,14 +106,14 @@ function createCircleLine(){
 		let u1 = 2 * Math.PI * (i + 1) / n;
 
 		let p0 = new THREE.Vector3(
-			Math.cos(u0), 
-			Math.sin(u0), 
+			Math.cos(u0),
+			Math.sin(u0),
 			0
 		);
 
 		let p1 = new THREE.Vector3(
-			Math.cos(u1), 
-			Math.sin(u1), 
+			Math.cos(u1),
+			Math.sin(u1),
 			0
 		);
 
@@ -126,11 +126,11 @@ function createCircleLine(){
 	const geometry = new LineGeometry();
 	geometry.setPositions(coordinates);
 
-	const material = new LineMaterial({ 
-		color: 0xff0000, 
-		dashSize: 5, 
+	const material = new LineMaterial({
+		color: 0xff0000,
+		dashSize: 5,
 		gapSize: 2,
-		linewidth: 2, 
+		linewidth: 2,
 		resolution:  new THREE.Vector2(1000, 1000),
 	});
 
@@ -146,7 +146,7 @@ function createCircleLine(){
 function createCircleCenter(){
 	const sg = new THREE.SphereGeometry(1, 32, 32);
 	const sm = new THREE.MeshNormalMaterial();
-	
+
 	const circleCenter = new THREE.Mesh(sg, sm);
 	circleCenter.visible = false;
 
@@ -161,9 +161,9 @@ function createLine(){
 		0, 0, 0,
 	]);
 
-	const material = new LineMaterial({ 
-		color: 0xff0000, 
-		linewidth: 2, 
+	const material = new LineMaterial({
+		color: 0xff0000,
+		linewidth: 2,
 		resolution:  new THREE.Vector2(1000, 1000),
 		gapSize: 1,
 		dashed: true,
@@ -186,14 +186,14 @@ function createCircle(){
 		let u1 = 2 * Math.PI * (i + 1) / n;
 
 		let p0 = new THREE.Vector3(
-			Math.cos(u0), 
-			Math.sin(u0), 
+			Math.cos(u0),
+			Math.sin(u0),
 			0
 		);
 
 		let p1 = new THREE.Vector3(
-			Math.cos(u1), 
-			Math.sin(u1), 
+			Math.cos(u1),
+			Math.sin(u1),
 			0
 		);
 
@@ -206,11 +206,11 @@ function createCircle(){
 	const geometry = new LineGeometry();
 	geometry.setPositions(coordinates);
 
-	const material = new LineMaterial({ 
-		color: 0xff0000, 
-		dashSize: 5, 
+	const material = new LineMaterial({
+		color: 0xff0000,
+		dashSize: 5,
 		gapSize: 2,
-		linewidth: 2, 
+		linewidth: 2,
 		resolution:  new THREE.Vector2(1000, 1000),
 	});
 
@@ -370,8 +370,8 @@ export class Measure extends THREE.Object3D {
 			]);
 
 			let lineMaterial = new LineMaterial({
-				color: 0xff0000, 
-				linewidth: 2, 
+				color: 0xff0000,
+				linewidth: 2,
 				resolution:  new THREE.Vector2(1000, 1000),
 			});
 
@@ -422,9 +422,9 @@ export class Measure extends THREE.Object3D {
 		{ // Event Listeners
 			let drag = (e) => {
 				let I = Utils.getMousePointCloudIntersection(
-					e.drag.end, 
-					e.viewer.scene.getActiveCamera(), 
-					e.viewer, 
+					e.drag.end,
+					e.viewer.scene.getActiveCamera(),
+					e.viewer,
 					e.viewer.scene.pointclouds,
 					{pickClipped: true});
 
@@ -432,7 +432,7 @@ export class Measure extends THREE.Object3D {
 					let i = this.spheres.indexOf(e.drag.object);
 					if (i !== -1) {
 						let point = this.points[i];
-						
+
 						// loop through current keys and cleanup ones that will be orphaned
 						for (let key of Object.keys(point)) {
 							if (!I.point[key]) {
@@ -607,7 +607,7 @@ export class Measure extends THREE.Object3D {
 	// 	// const [p0, p1] = this.points;
 
 	// 	// const r = p0.position.distanceTo(p1.position);
-		
+
 	// }
 
 	update () {
@@ -627,7 +627,7 @@ export class Measure extends THREE.Object3D {
 					posArray[0] = xy[0];
 					posArray[1] = xy[1];
 				}
-				let msg = posArray.map(p => Utils.addCommas(p.toFixed(2))).join(" / ");
+				let msg = posArray.map(p => Utils.addCommas(p.toFixed(3))).join(" / ");
 				coordinateLabel.setText(msg);
 
 				coordinateLabel.visible = this.showCoordinates;
@@ -676,7 +676,7 @@ export class Measure extends THREE.Object3D {
 				edge.geometry.computeBoundingSphere();
 				edge.computeLineDistances();
 				edge.visible = index < lastIndex || this.closed;
-				
+
 				if(!this.showEdges){
 					edge.visible = false;
 				}
@@ -820,7 +820,7 @@ export class Measure extends THREE.Object3D {
 				circleLine.position.copy(center);
 				circleLine.scale.set(radius, radius, radius);
 				circleLine.lookAt(target);
-				
+
 				circleRadiusLabel.visible = true;
 				circleRadiusLabel.position.copy(center.clone().add(B).multiplyScalar(0.5));
 				circleRadiusLabel.setText(`${radius.toFixed(3)}`);
